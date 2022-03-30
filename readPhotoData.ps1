@@ -33,12 +33,12 @@ function Get-DateTaken
 }
  
 ##Define the path of the photos
-$Path = "D:\OneDrive\Pictures (camera roll)\Test to sort"
+$Path = "C:\Users\Josie Vanpool\Desktop\Test\Test to sort"
 ##To get all the .JPG files from the folder specified
 $Files = Get-ChildItem $Path "*.jpg"
 
 Foreach($File in $Files){
-    $FilePath = $Path + "\" + $File.name
+    #$FilePath = $Path + "\" + $File.name
     $DateTaken = Get-ChildItem $Path\$File | Get-DateTaken
     return $DateTaken
 }
