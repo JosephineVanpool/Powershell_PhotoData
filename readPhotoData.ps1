@@ -37,43 +37,33 @@ function Get-DateTaken {
 }
 
 # Get the files which should be moved, without folders
-$files = Get-ChildItem 'C:\Users\Josie Vanpool\Desktop\Test\Test to sort' -Recurse | where {!$_.PsIsContainer}
- 
-# List Files which will be moved
-#$files
+$files = Get-ChildItem 'D:\OneDrive\Pictures (camera roll)' -Recurse | where {!$_.PsIsContainer}
  
 # Target Filder where files should be moved to. The script will automatically create a folder for the year and month.
-$targetPath = 'C:\Users\Josie Vanpool\Desktop\Test\Test Sorted'
+$targetPath = 'D:\OneDrive\To sort (saved by year-month)'
  
 foreach ($file in $files){
-
-#this does work
- # Get year and Month of the file
- # I used LastWriteTime since this are synced files and the creation day will be the date when it was synced
- #$year = $file.LastWriteTime.Year.ToString()
- #$month = $file.LastWriteTime.Month.ToString()
- 
-$DateTaken = Get-DateTaken $file.FullName  
+  $DateTaken = Get-DateTaken $file.FullName  
 
 
-#try to use DateTaken first, otherwiae use last write time
-If($DateTaken -ne 'Empty'){
-    $year = $DateTaken.Year
-    $month= $DateTaken.Month
-  } 
-  Else {
-   $year = $file.LastWriteTime.Year.ToString()
-   $month = $file.LastWriteTime.Month.ToString()
+  #try to use DateTaken first, otherwiae use last write time
+  If($DateTaken -ne 'Empty'){
+      $year = $DateTaken.Year
+      $month= $DateTaken.Month
+    } 
+    Else {
+    $year = $file.LastWriteTime.Year.ToString()
+    $month = $file.LastWriteTime.Month.ToString()
+    }
+
+  
+  # Set Directory Path
+  $Directory = $targetPath + "\" + $year + "\" + $month
+  # Create directory if it doesn't esist
+  if (!(Test-Path $Directory)){
+  New-Item $directory -type directory
   }
-
- 
-# Set Directory Path
-$Directory = $targetPath + "\" + $year + "\" + $month
-# Create directory if it doesn't esist
-if (!(Test-Path $Directory)){
-New-Item $directory -type directory
-}
- 
-# Move File to new location
-$file | Move-Item -Destination $Directory
-}
+  
+  # Move File to new location
+  $file | Move-Item -Destination $Directory
+  }
