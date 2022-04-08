@@ -37,33 +37,38 @@ function Get-DateTaken {
 }
 
 # Get the files which should be moved, without folders
-$files = Get-ChildItem 'D:\OneDrive\Pictures (camera roll)' -Recurse | where {!$_.PsIsContainer}
+$files = Get-ChildItem 'D:\OneDrive\Dump' -Recurse | where {!$_.PsIsContainer}
  
 # Target Filder where files should be moved to. The script will automatically create a folder for the year and month.
 $targetPath = 'D:\OneDrive\To sort (saved by year-month)'
  
 foreach ($file in $files){
-  $DateTaken = Get-DateTaken $file.FullName  
-
-
+  try {
   #try to use DateTaken first, otherwiae use last write time
-  If($DateTaken -ne 'Empty'){
-      $year = $DateTaken.Year
-      $month= $DateTaken.Month
-    } 
-    Else {
-    $year = $file.LastWriteTime.Year.ToString()
-    $month = $file.LastWriteTime.Month.ToString()
+  $DateTaken = Get-DateTaken $file.FullName  
+    If($DateTaken -ne 'Empty'){
+        $year = $DateTaken.Year
+        $month= $DateTaken.Month
+      }Else{
+      $year = $file.LastWriteTime.Year.ToString()
+      $month = $file.LastWriteTime.Month.ToString()
+      }
+    # Set Directory Path
+    $Directory = $targetPath + "\" + $year + "\" + $month
+    # Create directory if it doesn't exist
+    if (!(Test-Path $Directory)){
+    New-Item $directory -type directory
     }
-
-  
-  # Set Directory Path
-  $Directory = $targetPath + "\" + $year + "\" + $month
-  # Create directory if it doesn't esist
-  if (!(Test-Path $Directory)){
-  New-Item $directory -type directory
-  }
-  
-  # Move File to new location
-  $file | Move-Item -Destination $Directory
+    # Move File to new location
+    $file | Move-Item -Destination $Directory
+    }catch{
+      #set Directory path to be an Exceptions folder
+      $Directory = $targetPath + "\" + "Exceptions"
+      # Create directory if it doesn't esist
+      if (!(Test-Path $Directory)){
+      New-Item $directory -type directory
+      }
+      # Move File to new location
+      $file | Move-Item -Destination $Directory
+    }
   }
